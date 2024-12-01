@@ -25,6 +25,6 @@ jobs:
       - name: Run
         run: deno run --allow-net --allow-read --allow-env --allow-ffi src/main.ts
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           TRACKING_ISSUE_NO: 1
