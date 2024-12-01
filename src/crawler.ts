@@ -7,6 +7,14 @@ export function getCrawlerRepoPath({ host, pathname }: URL): string {
   if (pathname === "/") {
     return `data/web/${host}.html`;
   }
+
+  if (pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1);
+    pathname += ".html";
+  } else if (!/\.\w+$/.test(pathname)) {
+    pathname += ".html";
+  }
+
   return `data/web/${host}${pathname}`;
 }
 
