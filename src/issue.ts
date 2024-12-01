@@ -1,7 +1,6 @@
 import { getCrawlerRepoPathUrl, REPO } from "./crawler.ts";
 import { getGithubDiffUrl, getGithubFileUrl } from "./github.ts";
 import { FetchedRefsMap } from "./types.ts";
-import { sliceHash } from "./utils.ts";
 
 export function getIssueBody({
   repo,
@@ -23,8 +22,9 @@ export function getIssueBody({
     if (info.refs.length === 0) continue;
 
     const url = new URL(urlStr);
+
     // deno-fmt-ignore
-    lines.push(`**[${url.host}${url.pathname}](${url}) • [${info.latestCommit.date.toUTCString()}](${getCrawlerRepoPathUrl(url)})**`);
+    lines.push(`**[${url.host}${url.pathname}](${url})** • ${info.latestCommit.date.toUTCString()} • [source](${getCrawlerRepoPathUrl(url)})`);
     lines.push("");
 
     for (const ref of info.refs) {
@@ -35,18 +35,17 @@ export function getIssueBody({
         ref.line,
       );
 
-      const filepathContent = `[${ref.filepath}:${ref.line}](${fileGhUrl})`;
+      const filepathContent = `[\`${ref.filepath}:${ref.line}\`](${fileGhUrl})`;
       if (ref.commit.hash !== info.latestCommit.hash) {
-        // deno-fmt-ignore
-        const diffText = `${sliceHash(ref.commit.hash)}...${sliceHash(info.latestCommit.hash)}`;
         const diffGhUrl = getGithubDiffUrl(
           REPO,
           ref.commit.hash,
           info.latestCommit.hash,
         );
-        lines.push(`- [ ] ${filepathContent} • [${diffText}](${diffGhUrl})`);
+        // deno-fmt-ignore
+        lines.push(`- [ ] ${filepathContent} • ${ref.timestamp.toUTCString()} • [diff](${diffGhUrl})`);
       } else {
-        lines.push(`- [x] ${filepathContent}`);
+        lines.push(`- [x] ${filepathContent} • ${ref.timestamp.toUTCString()}`);
       }
 
       files.add(ref.filepath);
@@ -66,7 +65,7 @@ export function getIssueBody({
 
   return [
     // deno-fmt-ignore
-    `_Updated on ${updatedAt.toUTCString()}${warningsErrors ? ` (${warningsErrors})` : ""}_<br/>_${urlCount} URLs • ${fileCount} files • ${refsCount} refs_`,
+    `_Updated on ${updatedAt.toUTCString()}${warningsErrors ? ` (${warningsErrors})` : ""}_<br/>_${urlCount} URL(s) • ${fileCount} file(s) • ${refsCount} ref(s)_`,
     "",
     "### Referenced Pages",
     "",
