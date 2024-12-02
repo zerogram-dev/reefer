@@ -9,7 +9,7 @@ export function getGithubFileUrl(
 ): string {
   let url = `https://github.com/${repo}/blob/${branch}/${filepath}`;
   if (line !== undefined) {
-    url += `#L${line}`;
+    url += `?plain=1#L${line}`;
   }
   return url;
 }
